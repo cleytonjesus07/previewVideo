@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        justify-content: space-around;
+       
+        transition: background-image 200ms linear;
+        overflow-x: hidden;
+        background-color: #1e1e1e;
+        color: #fff;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-image: url("https://i0.wp.com/www.cyprusgamer.com/wp-content/uploads/2018/11/603c730c80ae4abc0e9d0870dd4177c8.jpg?resize=1068%2C601&ssl=1");
+        background-position: top;
+        background-repeat: no-repeat;
+        background-size: 100vw 100vh;
+        height: 100vh;
+       
+      }
+
+      body::after{
+          position: absolute;
+          content: "";
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.508);
+        z-index: -1;
+          filter: blur(5px);
+      }
+
+      .container{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+       
+      }
+
+      .playlist {
+        width: 100vw;
+        display: flex;
+        justify-content: center;
+       
+        padding: 0 100px;
+        flex-wrap: wrap;
+        z-index: 1;
+        transition: opacity 200ms ease-in;
+      }
+
+      .playlist > div {
+        overflow: hidden;
+        margin: 0 10px;
+        width: 220px;
+        cursor: pointer;
+        transition: 200ms linear;
+        margin: 10px;
+        background-color: rgba(0, 0, 0, 0.303);
+        border-radius: 0 0 5px 5px;
+      }
+
+      .playlist > div:hover {
+        transform: scale(1.1);
+        z-index: 1;
+      }
+
+     
+
+      video {
+        position: relative;
+        width: 100%;
+      }
+
+      .videoPlayer{
+        display: none;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+
+      .descContainer{
+        display: flex;
+        padding:10px;
+      }
+
+      .descContainer > div:nth-of-type(1){
+        overflow: hidden;
+        width: 35px;
+        height: 35px;
+        margin-right: 10px;
+        border-radius: 50%;
+        border-right: 2px solid rgb(0, 0, 0);
+        border-bottom: 2px solid rgb(0, 0, 0);
+      }
+      .descContainer > div:nth-of-type(1) > img{
+        width: 100%;
+        height: 100%;
+      }
+      .desc{
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Preview de vídeos</h2>
+    <p style="text-align: center;">
+      Mantenha o cursor por cima de um dos vídeos para ver uma prévia
+      <br/>
+      Ou clique em um para assistí-lo na integra
+    </p>
+    <div>
+      
+    <div class="container" >
+      <div class="playlist">
+ 
+      </div>
+      <div class="videoPlayer" style="height: 500px;width: 700px;">
+        <button id="close" title="Clique para fechar" style="position: fixed;top: 20px;right: 20px;background: none;border: none;padding: 20px; color: #fff;font-size: 18px;cursor: pointer;">X</button>
+        <span style="font-weight: 500;"></span>
+      <video id="player" style="width: 100%;height: 100%;" controls></video>
+      </div>
+    
+     
+    </div>
+
+    <script>
+        const playlist = document.getElementsByClassName("playlist")[0];
+    
+      let timeout = null;
+      const fileVideos = [
+        {
+          media:"./dg.mp4",
+          poster:"https://i0.wp.com/www.cyprusgamer.com/wp-content/uploads/2018/11/603c730c80ae4abc0e9d0870dd4177c8.jpg?resize=1068%2C601&ssl=1",
+          title:"Days Gone"
+        },
+        {
+          media:"./ds.mp4",
+          poster:"https://i.redd.it/oug8q0c6ij451.jpg",
+          title:"Demon's Souls"
+        },
+        {
+          media:"./got.mp4",
+          poster:"https://sm.ign.com/t/ign_in/screenshot/h/h312-ghost/h312-ghost-of-tsushimah3sucker-punchs-latest-adventure-is-de_ex8f.1200.jpg",
+          title:"Ghost of Tsushima"
+        },
+        {
+          media:"./hfbw.mp4",
+          poster:"https://i.pinimg.com/originals/c4/2b/80/c42b801a141486328498b8bb62461026.jpg",
+          title:"Horizon Forbidden West"
+        },
+        {
+          media:"./sackboy.mp4",
+          poster:"https://twinfinite.net/wp-content/uploads/2019/07/Screen-Shot-2019-07-01-at-12.33.05-PM.jpg",
+          title:"Sackboy: A big adventure"
+        },
+        {
+          media:"./spmm.mp4",
+          poster:"https://i.ytimg.com/vi/gd1_SOUnvyU/maxresdefault.jpg",
+          title:"Spider Man Miles Morales"
+        },
+        {
+          media:"./tlou2.mp4",
+          poster:"https://image.jeuxvideo.com/medias-md/159353/1593526606-591-card.jpg",
+          title:"The Last of Us part 2"
+        },
+        {
+          media:"./uc4.mp4",
+          poster:"https://www.rxwallpaper.site/wp-content/uploads/wallpaper-hd-uncharted-4-uncharted4-nathandrake-playstation.jpg",
+          title:"Uncharted 4"
+        },
+      ] 
+
+      
+
+      fileVideos.forEach(video =>{
+        const htmlElement = (`<div>
+          <video muted
+          disablePictureInPicture
+            src="${video.media}"
+            poster='${video.poster}'
+          ></video>
+          <div class='descContainer'>
+            <div>
+             <img src='https://www.shooter-szene.de/wp-content/uploads/2017/11/large-620x412.jpg' alt='Imagem do perfil'>
+            </div>
+            <div class='desc'>
+              <span>${video.title}</span>
+              <p>Postado por: <strong>Sony</strong></p>  
+            </div>
+          </div>
+        </div>`)
+        playlist.insertAdjacentHTML("beforeend",htmlElement);
+      })
+
+      const video = document.querySelectorAll(".playlist  video");
+      console.log(video)
+      video.forEach((video,i) => {
+        video.addEventListener("click",(e)=>{
+       
+         const videoPlayer = document.getElementsByClassName("videoPlayer")[0];
+         const player = document.getElementById("player");
+         playlist.style.opacity = 0;
+       
+         setTimeout(()=>{
+           player.src = e.target.getAttribute("src");
+           player.currentTime = e.target.currentTime;
+           playlist.style.display = "none";
+           videoPlayer.style.opacity = 1;
+           setTimeout(()=>{                  
+             videoPlayer.style.display = "flex";   
+             document.querySelector(".videoPlayer > span").textContent = fileVideos[i].title;  
+           
+            player.play();  
+          },150) 
+          
+         },150)
+        })
+        video.addEventListener("mouseenter", () => {
+         document.body.style.backgroundImage !== fileVideos[i].poster && (document.body.style.backgroundImage = `url(${fileVideos[i].poster})`)
+            video.playbackRate = 1;
+              video.muted = true;
+              video.currentTime = 1;
+            video.play();
+             timeout = setInterval(()=>video.currentTime = 1,900000)
+           
+        });
+        video.addEventListener("mouseleave", () => {
+         
+             video.playbackRate = 1;
+              video.muted = false;
+              video.currentTime = 0;
+              video.load();
+          }
+        );
+      });
+
+      const closeBtn = document.getElementById("close");
+      closeBtn.addEventListener("click",()=>{
+        const videoPlayer = document.getElementsByClassName("videoPlayer")[0];
+         const player = document.getElementById("player");
+        videoPlayer.style.opacity = 0;
+       
+       setTimeout(()=>{
+         player.src = null;
+         player.currentTime = null;
+         videoPlayer.style.display = "none";
+         playlist.style.opacity = 1;
+         setTimeout(()=>{                  
+           playlist.style.display = "flex";   
+           document.querySelector(".videoPlayer > span").textContent = null;  
+         
+          player.pause();  
+        },150) 
+        
+       },150)
+      })
+    </script>
+  </body>
+</html>
